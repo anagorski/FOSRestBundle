@@ -48,6 +48,8 @@ class ParamFetcher implements ParamFetcherInterface
      */
     private $controller;
 
+    private $groups = array();
+
     /**
      * Initializes fetcher.
      *
@@ -84,6 +86,20 @@ class ParamFetcher implements ParamFetcherInterface
         $config   = $this->params[$name];
         $nullable = $config->nullable;
         $default  = $config->default;
+        $groups = explode('|', $config->groups);
+
+        if(isset($groups[0]) && $groups[0] != ''){
+            $isGroup = false;
+            foreach($groups as $group){
+                if(in_array($group, $this->groups)){
+                    $isGroup = true;
+                    break;
+                }
+            }
+            if(!$isGroup){
+                return $default;
+            }
+        }
 
         if ($config->array) {
             $default = (array) $default;
@@ -186,6 +202,16 @@ class ParamFetcher implements ParamFetcherInterface
         return $params;
     }
 
+    public function setGroups($groups = array())
+    {
+        $this->groups = $groups;
+    }
+
+    public function getGroups()
+    {
+        return $this->groups;
+    }
+    
     /**
      * Initialize the parameters
      *
