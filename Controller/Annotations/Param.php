@@ -26,6 +26,8 @@ abstract class Param
     /** @var mixed */
     public $requirements = null;
     /** @var mixed */
+    public $groups;
+    /** @var string */
     public $default = null;
     /** @var string */
     public $description;
