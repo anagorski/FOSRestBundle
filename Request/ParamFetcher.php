@@ -44,6 +44,11 @@ class ParamFetcher implements ParamFetcherInterface
     private $controller;
 
     private $groups = array();
+    private $criteria;
+    private $acteptanceCriteria = array(
+        'eq',
+        '>'
+    );
 
     /**
      * Initializes fetcher.
@@ -107,6 +112,10 @@ class ParamFetcher implements ParamFetcherInterface
             throw new \InvalidArgumentException(sprintf("No @QueryParam/@RequestParam configuration for parameter '%s'.", $name));
         }
 
+        if(!is_null($params[$name]->criteria) && !in_array($params[$name]->criteria, $this->acteptanceCriteria)){
+            throw new \InvalidArgumentException(sprintf("No @QueryParam/@RequestParam configuration for acteptance criteria parameter '%s'.", $name));
+        }
+
         /** @var Param $config */
         $config   = $params[$name];
         $nullable = $config->nullable;
@@ -126,6 +135,8 @@ class ParamFetcher implements ParamFetcherInterface
                 return $default;
             }
         }
+
+        $criteria = $config->criteria;
 
         if ($config->array) {
             $default = (array) $default;
@@ -261,6 +272,21 @@ class ParamFetcher implements ParamFetcherInterface
         $params = array();
         foreach ($configuredParams as $name => $config) {
             $params[$name] = $this->get($name, $strict);
+        }
+
+        return $params;
+    }
+
+    public function getCriteria($strict = null)
+    {
+        $configuredParams = $this->getParams();
+
+        $params = array();
+        foreach ($configuredParams as $name => $config) {
+            if($this->get($name, $strict) && !is_null($configuredParams[$name]->criteria)){
+                $params['symbol'][$name] = $configuredParams[$name]->criteria;
+                $params['value'][$name] = $this->get($name, $strict);
+            }
         }
 
         return $params;

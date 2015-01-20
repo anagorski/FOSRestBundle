@@ -39,6 +39,9 @@ abstract class Param
     public $nullable = false;
     /** @var bool */
     public $allowBlank = true;
+    /** @var mixed */
+    public $criteria;
+
 
     /**
      * @return string
